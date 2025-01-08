@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <title>Fuel Calculator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
     <link rel="stylesheet" href="css/bootstrap.css" />
   </head>
   <body>
@@ -15,27 +15,23 @@
       let timerID;
 
       window.onload = function () {
-        if(localStorage.getItem("tableRows"))
-        {
+        if (localStorage.getItem("tableRows")) {
           tableRows = JSON.parse(localStorage.getItem("tableRows"));
         }
-        if(localStorage.getItem("timeOffset"))
-        {
+        if (localStorage.getItem("timeOffset")) {
           timeOffset = Number(localStorage.getItem("timeOffset"));
         }
-        if(localStorage.getItem("tankButtonVal"))
-        {
-          document.getElementById("selectedTank").value = localStorage.getItem("selectedTank");
+        if (localStorage.getItem("tankButtonVal")) {
+          document.getElementById("selectedTank").value =
+            localStorage.getItem("selectedTank");
         }
-        if(localStorage.getItem("startstopbutton"))
-        {
-          document.getElementById("startstopbutton").value = localStorage.getItem("startstopbutton");
+        if (localStorage.getItem("startstopbutton")) {
+          document.getElementById("startstopbutton").value =
+            localStorage.getItem("startstopbutton");
         }
-        if(localStorage.getItem("isRunning"))
-        {
-          isRunning = (localStorage.getItem("isRunning") === "true");
-          if(isRunning)
-          {
+        if (localStorage.getItem("isRunning")) {
+          isRunning = localStorage.getItem("isRunning") === "true";
+          if (isRunning) {
             timerID = setInterval(updateElapsedTime, 100);
             //disable left and right inputs and enable the total
             var leftTankElem = document.getElementById("leftTankVal");
@@ -49,13 +45,18 @@
         }
       };
 
-      function updateCache()
-      {
+      function updateCache() {
         //store data in cache
         localStorage.setItem("tableRows", JSON.stringify(tableRows));
         localStorage.setItem("timeOffset", timeOffset);
-        localStorage.setItem("selectedTank", document.getElementById("selectedTank").value);
-        localStorage.setItem("startstopbutton", document.getElementById("startstopbutton").value);
+        localStorage.setItem(
+          "selectedTank",
+          document.getElementById("selectedTank").value
+        );
+        localStorage.setItem(
+          "startstopbutton",
+          document.getElementById("startstopbutton").value
+        );
         localStorage.setItem("isRunning", isRunning);
       }
 
@@ -76,8 +77,7 @@
       function getThirdToLastTableRow() {
         return tableRows[tableRows.length - 3].row;
       }
-      function formatFloat(num)
-      {
+      function formatFloat(num) {
         return (Math.round(num * 100) / 100).toFixed(1);
       }
 
@@ -103,8 +103,7 @@
           var time = htmlrow.insertCell(3);
           var delta = htmlrow.insertCell(4);
 
-          if(i%2 == 1)
-          {
+          if (i % 2 == 1) {
             left.style.backgroundColor = "lightgray";
             right.style.backgroundColor = "lightgray";
             total.style.backgroundColor = "lightgray";
@@ -119,6 +118,7 @@
           delta.innerHTML = row.delta;
         }
         updateCache();
+        window.scrollTo({ left: 0, top: document.body.scrollHeight, behavior: "smooth" });
       }
 
       function updateElapsedTime(reset) {
@@ -131,18 +131,15 @@
         timeElapsed = Date.now() - timeOffset;
         elem.innerHTML = new Date(timeElapsed).toISOString().substr(11, 8);
 
-        if( (timeElapsed / 1000) > 60 * 30) // red at 30 minutes
-        {
+        if (timeElapsed / 1000 > 60 * 30) {
+          // red at 30 minutes
           //make timer background yellow
           elem.style.backgroundColor = "red";
-        }
-        else if( (timeElapsed / 1000) > 60 * 15) //yellow at 15 minutes
-        {
+        } else if (timeElapsed / 1000 > 60 * 15) {
+          //yellow at 15 minutes
           //make timer background yellow
           elem.style.backgroundColor = "yellow";
-        } 
-        else
-        {
+        } else {
           elem.style.backgroundColor = "";
         }
       }
@@ -155,7 +152,12 @@
 
         if (!isRunning) {
           //check to make sure we have left and right tank values
-          if (leftTankElem.value == "" || rightTankElem.value == "" || Number(leftTankElem.value == 0) || Number(rightTankElem.value) == 0) {
+          if (
+            leftTankElem.value == "" ||
+            rightTankElem.value == "" ||
+            Number(leftTankElem.value == 0) ||
+            Number(rightTankElem.value) == 0
+          ) {
             alert("Please provide values for left and right tanks.");
             return;
           }
@@ -168,10 +170,10 @@
           //copy values
           getLastTableRow().left = formatFloat(Number(leftTankElem.value));
           getLastTableRow().right = formatFloat(Number(rightTankElem.value));
-          getLastTableRow().total =
-            formatFloat(Number(leftTankElem.value) + Number(rightTankElem.value));
-          getLastTableRow().time =
-            new Date().toISOString().substr(11, 8);
+          getLastTableRow().total = formatFloat(
+            Number(leftTankElem.value) + Number(rightTankElem.value)
+          );
+          getLastTableRow().time = new Date().toISOString().substr(11, 8);
           getLastTableRow().delta = "";
           redrawTable();
 
@@ -179,7 +181,6 @@
           leftTankElem.style.visibility = "hidden";
           rightTankElem.style.visibility = "hidden";
           totalTankElem.style.visibility = "visible";
-
         } else {
           document.getElementById("startstopbutton").value = "Start";
           isRunning = false;
@@ -193,7 +194,7 @@
           leftTankElem.style.visibility = "visible";
           totalTankElem.style.visibility = "hidden";
           leftTankElem.value = "";
-          rightTankElem.value="";
+          rightTankElem.value = "";
         }
         updateCache();
       }
@@ -203,31 +204,36 @@
         var leftTankElem = document.getElementById("leftTankVal");
         var rightTankElem = document.getElementById("rightTankVal");
         var totalTankElem = document.getElementById("totalTankVal");
+        if (
+          (isRunning && totalTankElem.value == "") ||
+          Number(totalTankElem.value) == 0
+        ) {
+          alert("Please provide a new fuel total before swapping tanks.");
+          return;
+        }
+
         if (swapButton.value == "Tank: L") {
-          if(isRunning)
-          {
+          if (isRunning) {
             //currently on left tank
-            leftTankElem.value = formatFloat(Number(getLastTableRow().total) - Number(totalTankElem.value));
+            leftTankElem.value = formatFloat(
+              Number(getLastTableRow().total) - Number(totalTankElem.value)
+            );
             rightTankElem.value = "";
           }
           //swap
           swapButton.value = "Tank: R";
         } else {
-          if(isRunning)
-          {
+          if (isRunning) {
             //currently on right tank
-            rightTankElem.value = formatFloat(Number(getLastTableRow().total) - Number(totalTankElem.value));
+            rightTankElem.value = formatFloat(
+              Number(getLastTableRow().total) - Number(totalTankElem.value)
+            );
             leftTankElem.value = "";
           }
           swapButton.value = "Tank: L";
         }
         if (!isRunning) {
           updateCache();
-          return;
-        }
-        if(isRunning && totalTankElem.value=="" || Number(totalTankElem.value) == 0)
-        {
-          alert("Please provide a new fuel total before swapping tanks.");
           return;
         }
 
@@ -237,8 +243,9 @@
         //add our latest values to the next row
         getLastTableRow().left = formatFloat(Number(leftTankElem.value) * -1);
         getLastTableRow().right = formatFloat(Number(rightTankElem.value) * -1);
-        getLastTableRow().total =
-          formatFloat((Number(leftTankElem.value) + Number(rightTankElem.value)) * -1);
+        getLastTableRow().total = formatFloat(
+          (Number(leftTankElem.value) + Number(rightTankElem.value)) * -1
+        );
         getLastTableRow().time = "";
         getLastTableRow().delta = "";
         redrawTable();
@@ -246,15 +253,17 @@
         addTableRow();
         getLastTableRow().left = formatFloat(
           Number(getSecondToLastTableRow().left) +
-          Number(getThirdToLastTableRow().left));
-        getLastTableRow().right = formatFloat (
+            Number(getThirdToLastTableRow().left)
+        );
+        getLastTableRow().right = formatFloat(
           Number(getSecondToLastTableRow().right) +
-          Number(getThirdToLastTableRow().right));
-        getLastTableRow().total = formatFloat (
+            Number(getThirdToLastTableRow().right)
+        );
+        getLastTableRow().total = formatFloat(
           Number(getSecondToLastTableRow().total) +
-          Number(getThirdToLastTableRow().total));
-        getLastTableRow().time =
-          new Date().toISOString().substr(11, 8);
+            Number(getThirdToLastTableRow().total)
+        );
+        getLastTableRow().time = new Date().toISOString().substr(11, 8);
 
         var timeElapsed = Date.now() - timeOffset;
         timeOffset = Date.now();
@@ -267,15 +276,22 @@
         updateCache();
       }
     </script>
-    <div style="margin: 2%">
+    <div
+      style="
+        margin: 2%;
+        margin-top: 0px;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        background: white;
+      "
+    >
       <table style="width: 100%; text-align: center">
         <tr>
           <td style="text-align: center; width: 200px">
             <h2>Fuel Calculator</h2>
           </td>
-          <td>
-            
-          </td>
+          <td></td>
           <td>
             <input
               id="startstopbutton"
@@ -288,37 +304,47 @@
           <td id="runningTimer" style="width: 20%">00:00:00</td>
         </tr>
       </table>
-
+    </div>
+    <div style="margin: 2%; margin-top: 35px">
       <table style="width: 100%; text-align: left" id="runningTable">
         <tr>
-          <th>LEFT</th>
-          <th>RIGHT</th>
-          <th>TOTAL</th>
-          <th>TIME</th>
-          <th>DELTA</th>
+          <th style="position: sticky; top: 35px; background-color: white;">LEFT</th>
+          <th style="position: sticky; top: 35px; background-color: white;">RIGHT</th>
+          <th style="position: sticky; top: 35px; background-color: white;">TOTAL</th>
+          <th style="position: sticky; top: 35px; background-color: white;">TIME</th>
+          <th style="position: sticky; top: 35px; background-color: white;">DELTA</th>
         </tr>
         <tr>
           <td>
             <input
-              type="number"
+              type="tel"
               id="leftTankVal"
               style="width: 100%; border: 2px solid blue"
-              type="text"
             />
           </td>
           <td>
             <input
-              type="number"
+              type="tel"
               id="rightTankVal"
-              style="width: 100%; border: 2px solid blue;"
-              type="text"
+              style="width: 100%; border: 2px solid blue"
             />
           </td>
           <td>
-            <input id="totalTankVal" type="number" style="width: 100%; visibility: hidden; border: 2px solid blue" type="text" />
+            <input
+              id="totalTankVal"
+              type="number"
+              style="width: 100%; visibility: hidden; border: 2px solid blue"
+              type="text"
+            />
           </td>
-          <td colspan="2" style="width: 40%;">
-            <input id="selectedTank" style="width: 100%;" type="button" value="Tank: L" onclick="swapTanks()"/>
+          <td colspan="2" style="width: 40%">
+            <input
+              id="selectedTank"
+              style="width: 100%"
+              type="button"
+              value="Tank: L"
+              onclick="swapTanks()"
+            />
           </td>
         </tr>
       </table>
