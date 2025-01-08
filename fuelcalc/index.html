@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en" manifest="cache.manifest">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Fuel Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="stylesheet" href="css/bootstrap.css" />
+  </head>
+  <body>
+    <script>
+      let isRunning = false;
+      let timeOffset;
+      let clock;
+      let timerID;
+
+      window.onload = function () {
+        if(localStorage.getItem("tableRows"))
+        {
+          tableRows = JSON.parse(localStorage.getItem("tableRows"));
+        }
+        if(localStorage.getItem("timeOffset"))
+        {
+          timeOffset = Number(localStorage.getItem("timeOffset"));
+        }
+        if(localStorage.getItem("tankButtonVal"))
+        {
+          document.getElementById("selectedTank").value = localStorage.getItem("selectedTank");
+        }
+        if(localStorage.getItem("startstopbutton"))
+        {
+          document.getElementById("startstopbutton").value = localStorage.getItem("startstopbutton");
+        }
+        if(localStorage.getItem("isRunning"))
+        {
+          isRunning = (localStorage.getItem("isRunning") === "true");
+          if(isRunning)
+          {
+            timerID = setInterval(updateElapsedTime, 100);
+            //disable left and right inputs and enable the total
+            var leftTankElem = document.getElementById("leftTankVal");
+            var rightTankElem = document.getElementById("rightTankVal");
+            var totalTankElem = document.getElementById("totalTankVal");
+            leftTankElem.style.visibility = "hidden";
+            rightTankElem.style.visibility = "hidden";
+            totalTankElem.style.visibility = "visible";
+            redrawTable();
+          }
+        }
+      };
+
+      function updateCache()
+      {
+        //store data in cache
+        localStorage.setItem("tableRows", JSON.stringify(tableRows));
+        localStorage.setItem("timeOffset", timeOffset);
+        localStorage.setItem("selectedTank", document.getElementById("selectedTank").value);
+        localStorage.setItem("startstopbutton", document.getElementById("startstopbutton").value);
+        localStorage.setItem("isRunning", isRunning);
+      }
+
+      //define our table as javascript object
+      let tableRows = [];
+      function addTableRow() {
+        //console.log(tableRows);
+        tableRows.push({
+          row: { left: 0, right: 0, total: 0, time: 0, delta: 0 },
+        });
+      }
+      function getLastTableRow() {
+        return tableRows[tableRows.length - 1].row;
+      }
+      function getSecondToLastTableRow() {
+        return tableRows[tableRows.length - 2].row;
+      }
+      function getThirdToLastTableRow() {
+        return tableRows[tableRows.length - 3].row;
+      }
+      function formatFloat(num)
+      {
+        return (Math.round(num * 100) / 100).toFixed(1);
+      }
+
+      function redrawTable() {
+        // Find a <table> element with id="myTable":
+        var htmltable = document.getElementById("runningTable");
+
+        //delete all but last first and last row
+        while (htmltable.rows.length > 2) {
+          htmltable.deleteRow(1);
+        }
+
+        for (var i = 0; i < tableRows.length; i++) {
+          var row = tableRows[i].row;
+
+          // Create an empty <tr> element and add it to the 1st position of the table:
+          var htmlrow = htmltable.insertRow(htmltable.rows.length - 1);
+
+          // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+          var left = htmlrow.insertCell(0);
+          var right = htmlrow.insertCell(1);
+          var total = htmlrow.insertCell(2);
+          var time = htmlrow.insertCell(3);
+          var delta = htmlrow.insertCell(4);
+
+          if(i%2 == 1)
+          {
+            left.style.backgroundColor = "lightgray";
+            right.style.backgroundColor = "lightgray";
+            total.style.backgroundColor = "lightgray";
+            time.style.backgroundColor = "lightgray";
+            delta.style.backgroundColor = "lightgray";
+          }
+          //set values
+          left.innerHTML = row.left;
+          right.innerHTML = row.right;
+          total.innerHTML = row.total;
+          time.innerHTML = row.time;
+          delta.innerHTML = row.delta;
+        }
+        updateCache();
+      }
+
+      function updateElapsedTime(reset) {
+        var elem = document.getElementById("runningTimer");
+        if (reset) {
+          elem.innerHTML = "00:00:00";
+          elem.style.backgroundColor = "";
+          return;
+        }
+        timeElapsed = Date.now() - timeOffset;
+        elem.innerHTML = new Date(timeElapsed).toISOString().substr(11, 8);
+
+        if( (timeElapsed / 1000) > 60 * 30) // red at 30 minutes
+        {
+          //make timer background yellow
+          elem.style.backgroundColor = "red";
+        }
+        else if( (timeElapsed / 1000) > 60 * 15) //yellow at 15 minutes
+        {
+          //make timer background yellow
+          elem.style.backgroundColor = "yellow";
+        } 
+        else
+        {
+          elem.style.backgroundColor = "";
+        }
+      }
+
+      function onStartButton() {
+        var leftTankElem = document.getElementById("leftTankVal");
+        var rightTankElem = document.getElementById("rightTankVal");
+        var swapButton = document.getElementById("selectedTank");
+        var totalTankElem = document.getElementById("totalTankVal");
+
+        if (!isRunning) {
+          //check to make sure we have left and right tank values
+          if (leftTankElem.value == "" || rightTankElem.value == "" || Number(leftTankElem.value == 0) || Number(rightTankElem.value) == 0) {
+            alert("Please provide values for left and right tanks.");
+            return;
+          }
+          document.getElementById("startstopbutton").value = "Stop";
+          isRunning = true;
+          timeOffset = Date.now();
+          timerID = setInterval(updateElapsedTime, 100);
+          addTableRow();
+
+          //copy values
+          getLastTableRow().left = formatFloat(Number(leftTankElem.value));
+          getLastTableRow().right = formatFloat(Number(rightTankElem.value));
+          getLastTableRow().total =
+            formatFloat(Number(leftTankElem.value) + Number(rightTankElem.value));
+          getLastTableRow().time =
+            new Date().toISOString().substr(11, 8);
+          getLastTableRow().delta = "";
+          redrawTable();
+
+          //disable left and right inputs and enable the total
+          leftTankElem.style.visibility = "hidden";
+          rightTankElem.style.visibility = "hidden";
+          totalTankElem.style.visibility = "visible";
+
+        } else {
+          document.getElementById("startstopbutton").value = "Start";
+          isRunning = false;
+          clearInterval(timerID);
+          updateElapsedTime(true);
+
+          //delete all table rows
+          tableRows.length = 0;
+          redrawTable();
+          rightTankElem.style.visibility = "visible";
+          leftTankElem.style.visibility = "visible";
+          totalTankElem.style.visibility = "hidden";
+          leftTankElem.value = "";
+          rightTankElem.value="";
+        }
+        updateCache();
+      }
+
+      function swapTanks() {
+        var swapButton = document.getElementById("selectedTank");
+        var leftTankElem = document.getElementById("leftTankVal");
+        var rightTankElem = document.getElementById("rightTankVal");
+        var totalTankElem = document.getElementById("totalTankVal");
+        if (swapButton.value == "Tank: L") {
+          if(isRunning)
+          {
+            //currently on left tank
+            leftTankElem.value = formatFloat(Number(getLastTableRow().total) - Number(totalTankElem.value));
+            rightTankElem.value = "";
+          }
+          //swap
+          swapButton.value = "Tank: R";
+        } else {
+          if(isRunning)
+          {
+            //currently on right tank
+            rightTankElem.value = formatFloat(Number(getLastTableRow().total) - Number(totalTankElem.value));
+            leftTankElem.value = "";
+          }
+          swapButton.value = "Tank: L";
+        }
+        if (!isRunning) {
+          updateCache();
+          return;
+        }
+        if(isRunning && totalTankElem.value=="" || Number(totalTankElem.value) == 0)
+        {
+          alert("Please provide a new fuel total before swapping tanks.");
+          return;
+        }
+
+        //add a row to our calculation table
+        addTableRow();
+
+        //add our latest values to the next row
+        getLastTableRow().left = formatFloat(Number(leftTankElem.value) * -1);
+        getLastTableRow().right = formatFloat(Number(rightTankElem.value) * -1);
+        getLastTableRow().total =
+          formatFloat((Number(leftTankElem.value) + Number(rightTankElem.value)) * -1);
+        getLastTableRow().time = "";
+        getLastTableRow().delta = "";
+        redrawTable();
+
+        addTableRow();
+        getLastTableRow().left = formatFloat(
+          Number(getSecondToLastTableRow().left) +
+          Number(getThirdToLastTableRow().left));
+        getLastTableRow().right = formatFloat (
+          Number(getSecondToLastTableRow().right) +
+          Number(getThirdToLastTableRow().right));
+        getLastTableRow().total = formatFloat (
+          Number(getSecondToLastTableRow().total) +
+          Number(getThirdToLastTableRow().total));
+        getLastTableRow().time =
+          new Date().toISOString().substr(11, 8);
+
+        var timeElapsed = Date.now() - timeOffset;
+        timeOffset = Date.now();
+        getLastTableRow().delta = new Date(timeElapsed)
+          .toISOString()
+          .substr(11, 8);
+
+        redrawTable();
+        totalTankElem.value = "";
+        updateCache();
+      }
+    </script>
+    <div style="margin: 2%">
+      <table style="width: 100%; text-align: center">
+        <tr>
+          <td style="text-align: center; width: 200px">
+            <h2>Fuel Calculator</h2>
+          </td>
+          <td>
+            
+          </td>
+          <td>
+            <input
+              id="startstopbutton"
+              style="width: 100%"
+              type="button"
+              value="Start"
+              onclick="onStartButton()"
+            />
+          </td>
+          <td id="runningTimer" style="width: 20%">00:00:00</td>
+        </tr>
+      </table>
+
+      <table style="width: 100%; text-align: left" id="runningTable">
+        <tr>
+          <th>LEFT</th>
+          <th>RIGHT</th>
+          <th>TOTAL</th>
+          <th>TIME</th>
+          <th>DELTA</th>
+        </tr>
+        <tr>
+          <td>
+            <input
+              type="number"
+              id="leftTankVal"
+              style="width: 100%; border: 2px solid blue"
+              type="text"
+            />
+          </td>
+          <td>
+            <input
+              type="number"
+              id="rightTankVal"
+              style="width: 100%; border: 2px solid blue;"
+              type="text"
+            />
+          </td>
+          <td>
+            <input id="totalTankVal" type="number" style="width: 100%; visibility: hidden; border: 2px solid blue" type="text" />
+          </td>
+          <td colspan="2" style="width: 40%;">
+            <input id="selectedTank" style="width: 100%;" type="button" value="Tank: L" onclick="swapTanks()"/>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <script src="js/bootstrap.js"></script>
+  </body>
+</html>
