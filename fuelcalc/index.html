@@ -118,7 +118,11 @@
           delta.innerHTML = row.delta;
         }
         updateCache();
-        window.scrollTo({ left: 0, top: document.body.scrollHeight, behavior: "smooth" });
+        window.scrollTo({
+          left: 0,
+          top: document.body.scrollHeight,
+          behavior: "smooth",
+        });
       }
 
       function updateElapsedTime(reset) {
@@ -205,8 +209,8 @@
         var rightTankElem = document.getElementById("rightTankVal");
         var totalTankElem = document.getElementById("totalTankVal");
         if (
-          (isRunning && totalTankElem.value == "") ||
-          Number(totalTankElem.value) == 0
+          isRunning &&
+          (totalTankElem.value == "" || Number(totalTankElem.value) == 0)
         ) {
           alert("Please provide a new fuel total before swapping tanks.");
           return;
@@ -308,11 +312,21 @@
     <div style="margin: 2%; margin-top: 35px">
       <table style="width: 100%; text-align: left" id="runningTable">
         <tr>
-          <th style="position: sticky; top: 35px; background-color: white;">LEFT</th>
-          <th style="position: sticky; top: 35px; background-color: white;">RIGHT</th>
-          <th style="position: sticky; top: 35px; background-color: white;">TOTAL</th>
-          <th style="position: sticky; top: 35px; background-color: white;">TIME</th>
-          <th style="position: sticky; top: 35px; background-color: white;">DELTA</th>
+          <th style="position: sticky; top: 35px; background-color: white">
+            LEFT
+          </th>
+          <th style="position: sticky; top: 35px; background-color: white">
+            RIGHT
+          </th>
+          <th style="position: sticky; top: 35px; background-color: white">
+            TOTAL
+          </th>
+          <th style="position: sticky; top: 35px; background-color: white">
+            TIME
+          </th>
+          <th style="position: sticky; top: 35px; background-color: white">
+            DELTA
+          </th>
         </tr>
         <tr>
           <td>
