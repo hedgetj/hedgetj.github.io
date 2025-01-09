@@ -208,16 +208,14 @@
         var leftTankElem = document.getElementById("leftTankVal");
         var rightTankElem = document.getElementById("rightTankVal");
         var totalTankElem = document.getElementById("totalTankVal");
-        if (
-          isRunning &&
-          (totalTankElem.value == "" || Number(totalTankElem.value) == 0)
-        ) {
-          alert("Please provide a new fuel total before swapping tanks.");
-          return;
+
+        var justSwap = false;
+        if (totalTankElem.value == "" || Number(totalTankElem.value) == 0) {
+          justSwap = true;
         }
 
         if (swapButton.value == "Tank: L") {
-          if (isRunning) {
+          if (isRunning && !justSwap) {
             //currently on left tank
             leftTankElem.value = formatFloat(
               Number(getLastTableRow().total) - Number(totalTankElem.value)
@@ -227,7 +225,7 @@
           //swap
           swapButton.value = "Tank: R";
         } else {
-          if (isRunning) {
+          if (isRunning && !justSwap) {
             //currently on right tank
             rightTankElem.value = formatFloat(
               Number(getLastTableRow().total) - Number(totalTankElem.value)
@@ -236,7 +234,7 @@
           }
           swapButton.value = "Tank: L";
         }
-        if (!isRunning) {
+        if (!isRunning || justSwap) {
           updateCache();
           return;
         }
