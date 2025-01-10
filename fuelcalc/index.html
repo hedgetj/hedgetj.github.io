@@ -177,7 +177,7 @@
           getLastTableRow().total = formatFloat(
             Number(leftTankElem.value) + Number(rightTankElem.value)
           );
-          getLastTableRow().time = new Date().toISOString().substr(11, 8);
+          getLastTableRow().time = new Date().toTimeString().substr(0, 8);
           getLastTableRow().delta = "";
           redrawTable();
 
@@ -265,7 +265,7 @@
           Number(getSecondToLastTableRow().total) +
             Number(getThirdToLastTableRow().total)
         );
-        getLastTableRow().time = new Date().toISOString().substr(11, 8);
+        getLastTableRow().time = new Date().toTimeString().substr(0, 8);
 
         var timeElapsed = Date.now() - timeOffset;
         timeOffset = Date.now();
@@ -303,44 +303,40 @@
               onclick="onStartButton()"
             />
           </td>
-          <td id="runningTimer" style="width: 25%">00:00:00</td>
+          <td id="runningTimer" style="width: 25%;">00:00:00</td>
         </tr>
       </table>
     </div>
-    <div style="margin: 2%; margin-top: 35px">
+    <div style="margin: 2%; margin-top: 40px">
       <table style="width: 100%; text-align: left" id="runningTable">
         <tr>
-          <th style="position: sticky; top: 35px; background-color: white">
+          <th style="position: sticky; top: 40px; background-color: white">
             LEFT
           </th>
-          <th style="position: sticky; top: 35px; background-color: white">
+          <th style="position: sticky; top: 40px; background-color: white">
             RIGHT
           </th>
-          <th style="position: sticky; top: 35px; background-color: white">
+          <th style="position: sticky; top: 40px; background-color: white">
             TOTAL
           </th>
-          <th style="position: sticky; top: 35px; background-color: white">
+          <th style="position: sticky; top: 40px; background-color: white">
             TIME
           </th>
-          <th style="position: sticky; top: 35px; background-color: white">
+          <th style="position: sticky; top: 40px; background-color: white">
             DELTA
           </th>
         </tr>
         <tr>
           <td>
             <input
-              input
-              type="text"
-              pattern="[0-9]*"
+              type="number"
               id="leftTankVal"
               style="width: 100%; border: 2px solid blue"
             />
           </td>
           <td>
             <input
-              input
-              type="text"
-              pattern="[0-9]*"
+              type="number"
               id="rightTankVal"
               style="width: 100%; border: 2px solid blue"
             />
@@ -348,9 +344,7 @@
           <td>
             <input
               id="totalTankVal"
-              input
-              type="text"
-              pattern="[0-9]*"
+              type="number"
               style="width: 100%; visibility: hidden; border: 2px solid blue"
             />
           </td>
