@@ -303,7 +303,7 @@
               onclick="onStartButton()"
             />
           </td>
-          <td id="runningTimer" style="width: 25%;">00:00:00</td>
+          <td id="runningTimer" style="width: 25%">00:00:00</td>
         </tr>
       </table>
     </div>
@@ -330,6 +330,8 @@
           <td>
             <input
               type="number"
+              pattern="\d*"
+              inputmode="decimal"
               id="leftTankVal"
               style="width: 100%; border: 2px solid blue"
             />
@@ -337,14 +339,18 @@
           <td>
             <input
               type="number"
+              pattern="\d*"
+              inputmode="decimal"
               id="rightTankVal"
               style="width: 100%; border: 2px solid blue"
             />
           </td>
           <td>
             <input
-              id="totalTankVal"
               type="number"
+              pattern="\d*"
+              inputmode="decimal"
+              id="totalTankVal"
               style="width: 100%; visibility: hidden; border: 2px solid blue"
             />
           </td>
